@@ -1,0 +1,27 @@
+body {
+  padding-bottom: 15%;
+}
+
+/* .success,
+.error {
+  color: white;
+  padding: 5px;
+  margin: 5px 0 15px 0;
+}
+
+.success {
+  background: green;
+}
+
+.error {
+  background: red;
+} */
+
+#amt-row {
+  position: sticky;
+  top: 0px;
+  margin: 0;
+  padding: 10px 0 0 0;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 2;
+}
