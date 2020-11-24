@@ -11,14 +11,14 @@ export const AddTransaction = () => {
   } = useContext(GlobalContext);
 
   const [type, setType] = useState('');
-  const [desc, setDesc] = useState('');
+  const [descn, setDescn] = useState('');
   const [amt, setAmt] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
 
   const clearFields = () => {
     setType('');
-    setDesc('');
+    setDescn('');
     setAmt('');
     setDate('');
     setTime('');
@@ -33,7 +33,7 @@ export const AddTransaction = () => {
     if (updId === '') {
       const Transaction = {
         type,
-        desc,
+        descn,
         amt: parseInt(amt),
         date: temp,
       };
@@ -42,7 +42,7 @@ export const AddTransaction = () => {
       const [transaction] = transactions.filter(txn => txn._id === updId);
       const Transaction = {
         type: type !== '' ? type : transaction.type,
-        desc: desc !== '' ? desc : transaction.desc,
+        descn: descn !== '' ? descn : transaction.descn,
         amt: amt !== '' ? parseInt(amt) : transaction.amt,
         date: date !== '' ? temp : transaction.date,
       };
@@ -78,10 +78,10 @@ export const AddTransaction = () => {
             <div className="input-field col s12 form-control">
               <input
                 type="text"
-                value={desc}
-                onChange={e => setDesc(e.target.value)}
+                value={descn}
+                onChange={e => setDescn(e.target.value)}
               />
-              <label htmlFor="desc">Description</label>
+              <label htmlFor="descn">Description</label>
             </div>
           </div>
           <div className="row">

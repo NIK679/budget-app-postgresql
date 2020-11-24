@@ -7,7 +7,7 @@ export const Transaction = ({ transaction }) => {
     <>
       <div className="row">
         <div className="col s6">
-          <span className="">{transaction.desc}</span>
+          <span className="">{transaction.descn}</span>
         </div>
         <div
           className={`col s2 ${

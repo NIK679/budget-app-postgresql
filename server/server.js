@@ -37,7 +37,7 @@ app.post('/api/v1/transactions', async (req, res) => {
   try {
     const results = await db.query(
       'INSERT INTO transactions (type, descn, amt, date) values ($1, $2, $3, $4) returning *',
-      [req.body.type, req.body.desc, req.body.amt, req.body.date]
+      [req.body.type, req.body.descn, req.body.amt, req.body.date]
     );
     console.log(results);
     res.status(201).json({
@@ -66,8 +66,8 @@ app.post('/api/v1/transactions', async (req, res) => {
 app.put('/api/v1/transactions/:id', async (req, res) => {
   try {
     const results = await db.query(
-      'UPDATE transactions SET type = $1, descn = $2, amt = $3, date = $4 where id = $5 returning *',
-      [req.body.type, req.body.desc, req.body.amt, req.body.date, req.params.id]
+      'UPDATE transactions SET type = $1, descn = $2, amt = $3, date = $4 where _id = $5 returning *',
+      [req.body.type, req.body.descn, req.body.amt, req.body.date, req.params.id]
     );
 
     res.status(200).json({
@@ -97,7 +97,7 @@ app.put('/api/v1/transactions/:id', async (req, res) => {
 
 app.delete('/api/v1/transactions/:id', async (req, res) => {
   try {
-    const results = db.query('DELETE FROM transactions where id = $1', [req.params.id]);
+    const results = db.query('DELETE FROM transactions where _id = $1', [req.params.id]);
     res.status(204).json({
       success: true,
       data: {},
