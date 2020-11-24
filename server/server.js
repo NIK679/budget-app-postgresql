@@ -93,7 +93,7 @@ app.put('/api/v1/transactions/:id', async (req, res) => {
   console.log(req.body);
 });
 
-// Delete Restaurant
+// Delete Transaction
 
 app.delete('/api/v1/transactions/:id', async (req, res) => {
   try {
