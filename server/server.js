@@ -1,103 +1,93 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const db = require("./db");
-
-const morgan = require("morgan");
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
+const db = require('./db');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Get all Restaurants
-app.get("/api/v1/restaurants", async (req, res) => {
+// Get all transactions
+app.get('/api/v1/transactions', async (req, res) => {
   try {
-    //const results = await db.query("select * from restaurants");
-    const restaurantRatingsData = await db.query(
-      "select * from restaurants left join (select restaurant_id, COUNT(*), TRUNC(AVG(rating),1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id;"
-    );
+    // const results = await db.query("select * from transactions");
+    const transactions = await db.query('select * from transactions;');
 
     res.status(200).json({
-      status: "success",
-      results: restaurantRatingsData.rows.length,
-      data: {
-        restaurants: restaurantRatingsData.rows,
-      },
+      success: true,
+      count: transactions.rows.length,
+      data: transactions.rows,
     });
   } catch (err) {
     console.log(err);
-  }
-});
-
-//Get a Restaurant
-app.get("/api/v1/restaurants/:id", async (req, res) => {
-  console.log(req.params.id);
-
-  try {
-    const restaurant = await db.query(
-      "select * from restaurants left join (select restaurant_id, COUNT(*), TRUNC(AVG(rating),1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id where id = $1",
-      [req.params.id]
-    );
-    // select * from restaurants wehre id = req.params.id
-
-    const reviews = await db.query(
-      "select * from reviews where restaurant_id = $1",
-      [req.params.id]
-    );
-    console.log(reviews);
-
-    res.status(200).json({
-      status: "succes",
-      data: {
-        restaurant: restaurant.rows[0],
-        reviews: reviews.rows,
-      },
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
     });
-  } catch (err) {
-    console.log(err);
   }
 });
 
-// Create a Restaurant
+// Create a Transaction
 
-app.post("/api/v1/restaurants", async (req, res) => {
+app.post('/api/v1/transactions', async (req, res) => {
   console.log(req.body);
 
   try {
     const results = await db.query(
-      "INSERT INTO restaurants (name, location, price_range) values ($1, $2, $3) returning *",
-      [req.body.name, req.body.location, req.body.price_range]
+      'INSERT INTO transactions (type, descn, amt, date) values ($1, $2, $3, $4) returning *',
+      [req.body.type, req.body.desc, req.body.amt, req.body.date]
     );
     console.log(results);
     res.status(201).json({
-      status: "succes",
-      data: {
-        restaurant: results.rows[0],
-      },
+      success: true,
+      data: results.rows[0],
     });
   } catch (err) {
     console.log(err);
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(val => val.message);
+
+      return res.status(400).json({
+        success: false,
+        error: messages,
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
+    });
   }
 });
 
-// Update Restaurants
+// Update transactions
 
-app.put("/api/v1/restaurants/:id", async (req, res) => {
+app.put('/api/v1/transactions/:id', async (req, res) => {
   try {
     const results = await db.query(
-      "UPDATE restaurants SET name = $1, location = $2, price_range = $3 where id = $4 returning *",
-      [req.body.name, req.body.location, req.body.price_range, req.params.id]
+      'UPDATE transactions SET type = $1, descn = $2, amt = $3, date = $4 where id = $5 returning *',
+      [req.body.type, req.body.desc, req.body.amt, req.body.date, req.params.id]
     );
 
     res.status(200).json({
-      status: "succes",
-      data: {
-        retaurant: results.rows[0],
-      },
+      success: true,
+      data: results.rows[0],
     });
   } catch (err) {
     console.log(err);
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(val => val.message);
+
+      return res.status(400).json({
+        success: false,
+        error: messages,
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
+    });
   }
   console.log(req.params.id);
   console.log(req.body);
@@ -105,38 +95,23 @@ app.put("/api/v1/restaurants/:id", async (req, res) => {
 
 // Delete Restaurant
 
-app.delete("/api/v1/restaurants/:id", async (req, res) => {
+app.delete('/api/v1/transactions/:id', async (req, res) => {
   try {
-    const results = db.query("DELETE FROM restaurants where id = $1", [
-      req.params.id,
-    ]);
+    const results = db.query('DELETE FROM transactions where id = $1', [req.params.id]);
     res.status(204).json({
-      status: "sucess",
+      success: true,
+      data: {},
     });
   } catch (err) {
     console.log(err);
-  }
-});
-
-app.post("/api/v1/restaurants/:id/addReview", async (req, res) => {
-  try {
-    const newReview = await db.query(
-      "INSERT INTO reviews (restaurant_id, name, review, rating) values ($1, $2, $3, $4) returning *;",
-      [req.params.id, req.body.name, req.body.review, req.body.rating]
-    );
-    console.log(newReview);
-    res.status(201).json({
-      status: "success",
-      data: {
-        review: newReview.rows[0],
-      },
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
     });
-  } catch (err) {
-    console.log(err);
   }
 });
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`server is up and listening on port ${port}`);
 });
